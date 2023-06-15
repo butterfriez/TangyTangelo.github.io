@@ -2,15 +2,15 @@ const cells = document.querySelectorAll(".cell");
 const statusText = document.querySelector("#status");
 const restartBtn = document.querySelector("#restart");
 const winConditions = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7 ,8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6]
-    ];
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+];
 const slider = document.getElementById("difficultySlider");
 const output = document.getElementById("titleDifficulty");
 const maxDepth = 7;
@@ -28,94 +28,71 @@ let scores = {
 };
 
 function initGame() {
-    cells.forEach(cell => cell.addEventListener("click", cellClicked));
+    cells.forEach((cell) => cell.addEventListener("click", cellClicked));
     restartBtn.addEventListener("click", restartGame);
     statusText.textContent = `${currentPlayer}'s turn`;
     gameRunning = true;
     minimaxStep = 0;
-};
+}
 
 function cellClicked() {
     const cellIndex = this.getAttribute("cellIndex");
 
-    if (mainBoard[cellIndex] != "" || !gameRunning) {
+    if (mainBoard[cellIndex] !== "" || !gameRunning) {
         return;
-    };
+    }
+
     updateCell(this, cellIndex);
-};
+}
 
 function updateCell(cell, index) {
     mainBoard[index] = currentPlayer;
     cell.textContent = currentPlayer;
-    var roundWon = false;
-    roundWon = checkWinner(mainBoard);
 
-    if (roundWon) {
-        statusText.textContent = `${currentPlayer} wins!`;
+    if (checkWinner(mainBoard)) {
         gameRunning = false;
         cells.forEach((cell) => cell.removeEventListener("click", cellClicked));
+        statusText.textContent = `${currentPlayer} wins!`;
     } else if (!mainBoard.includes("")) {
-        statusText.textContent = `Draw!`;
         gameRunning = false;
+        statusText.textContent = "Draw!";
     } else {
+        changePlayer();
         continueGameMode();
     }
-};
+}
 
-function changePlayer() {    
-    currentPlayer = (currentPlayer === "X") ? "O" : "X";
+function changePlayer() {
+    currentPlayer = currentPlayer === "X" ? "O" : "X";
     statusText.textContent = `${currentPlayer}'s turn`;
-};
+}
 
 function checkWinner(board) {
-    let roundWon = false;
-    let winner = null;
     for (let i = 0; i < winConditions.length; i++) {
-        const condition = winConditions[i];
-        const cellA = board[condition[0]];
-        const cellB = board[condition[1]];
-        const cellC = board[condition[2]];
-  
-        if (cellA == "" || cellB == "" || cellC == "") {
-            continue;
-        }
-        if (cellA == cellB && cellB == cellC) {
-            roundWon = true;
-            winner = currentPlayer;
-            break;
+        const [a, b, c] = winConditions[i];
+        if (board[a] !== "" && board[a] === board[b] && board[b] === board[c]) {
+            return true;
         }
     }
-  
-    if (roundWon) {
-        return winner;
-    } else if (!board.includes("")) {
-        return "tie";
-    } else {
-        return null;
-    }
+    return false;
 }
-  
+
 function continueGameMode() {
     if (Number(slider.value) === 1) {
-        changePlayer();
     } else if (Number(slider.value) === 2) {
-        changePlayer();
-        if (currentPlayer == AIPlayer) {
+        if (currentPlayer === AIPlayer) {
             randomAIMove();
         }
     } else if (Number(slider.value) === 3) {
-        changePlayer();
         if (currentPlayer === AIPlayer) {
-            console.log("its ai's turn")
-            makeAIMove()
-        };
-    };
-};
+            makeAIMove();
+        }
+    }
+}
 
 function makeAIMove() {
     let bestMove = getBestMove();
-    updateCell(document.querySelector(`[cellIndex="${bestMove}"]`), bestMove);
-    console.log('hmmmmm')
+    updateCell(cells[bestMove], bestMove);
 }
 
 function getBestMove() {
@@ -129,11 +106,11 @@ function getBestMove() {
             if (score > bestScore) {
                 bestScore = score;
                 bestMove = i;
-            };
-        };
-    };
+            }
+        }
+    }
     return bestMove;
-};
+}
 
 function restartGame() {
     currentPlayer = "X";
@@ -141,25 +118,25 @@ function restartGame() {
     minimaxStep = 0;
     gameRunning = true;
     statusText.textContent = `${currentPlayer}'s turn`;
-    cells.forEach(cell => cell.textContent = "");
-    cells.forEach(cell => cell.addEventListener("click", cellClicked))
-};
+    cells.forEach((cell) => (cell.textContent = ""));
+    cells.forEach((cell) => cell.addEventListener("click", cellClicked));
+}
 
 function randomAIMove() {
     let available = [];
     for (let i = 0; i < 9; i++) {
-        if (mainBoard[i] == "") {
+        if (mainBoard[i] === "") {
             available.push(i);
         }
     }
-    let value = available[Math.floor(Math.random()*available.length)];
-    updateCell(document.querySelector(`[cellIndex="${value}"]`), value);
-};
+    let value = available[Math.floor(Math.random() * available.length)];
+    updateCell(cells[value], value);
+}
 
 function minimax(board, depth, isMaximizingPlayer) {
     let result = checkWinner(board);
-    if (result !== null) {
-        return scores[result];
+    if (result) {
+        return scores[currentPlayer];
     }
 
     if (isMaximizingPlayer) {
@@ -187,6 +164,8 @@ function minimax(board, depth, isMaximizingPlayer) {
     }
 }
 
-slider.oninput = function() {restartGame()};
+slider.oninput = function () {
+    restartGame();
+};
 
 initGame();
