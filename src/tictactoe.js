@@ -33,6 +33,33 @@ function initGame() {
     statusText.textContent = `${currentPlayer}'s turn`;
     gameRunning = true;
     minimaxStep = 0;
+    setGametype(localStorage.getItem('gametype'));
+    initTitle();
+}
+
+function initTitle() {
+    if(getGametype() === 'Player') output.innerText = '2 Players';
+    else if(getGametype() === 'Brainless AI') output.innerText = 'Brainless AI';
+    else if(getGametype() === 'Smart AI') output.innerText = 'Smart AI';
+}
+
+function setGametype(value) {
+    slider.value = value;
+}
+
+function saveGametype() {
+    localStorage.setItem('gametype', slider.value);
+}
+
+function getGametype() {
+    switch (Number(slider.value)) {
+        case 1:
+            return 'Player';
+        case 2:
+            return 'Brainless AI';
+        case 3:
+            return 'Smart AI';
+    }
 }
 
 function cellClicked() {
@@ -78,12 +105,11 @@ function checkWinner(board) {
 }
 
 function continueGameMode() {
-    if (Number(slider.value) === 1) {
-    } else if (Number(slider.value) === 2) {
+    if (getGametype() === 'Brainless AI') {
         if (currentPlayer === AIPlayer) {
             randomAIMove();
         }
-    } else if (Number(slider.value) === 3) {
+    } else if (getGametype() === 'Smart AI') {
         if (currentPlayer === AIPlayer) {
             makeAIMove();
         }
@@ -164,8 +190,10 @@ function minimax(board, depth, isMaximizingPlayer) {
     }
 }
 
-slider.oninput = function () {
+slider.oninput = function (e) {
     restartGame();
+    initTitle();
+    saveGametype();
 };
 
 initGame();
