@@ -14,13 +14,13 @@ const winConditions = [
 const slider = document.getElementById("difficultySlider");
 const output = document.getElementById("titleDifficulty");
 const maxDepth = 7;
+const AIPlayer = "O";
+const HumanPlayer = "X";
+
 
 let mainBoard = ["", "", "", "", "", "", "", "", ""];
 let currentPlayer = "X";
-let AIPlayer = "O";
-let HumanPlayer = "X";
 let gameRunning = false;
-let minimaxStep;
 let scores = {
     X: 10,
     O: -10,
@@ -32,7 +32,33 @@ function initGame() {
     restartBtn.addEventListener("click", restartGame);
     statusText.textContent = `${currentPlayer}'s turn`;
     gameRunning = true;
-    minimaxStep = 0;
+    setGametype(localStorage.getItem('gametype'));
+    initTitle();
+}
+
+function initTitle() {
+    if(getGametype() === 'Player') output.innerText = '2 Players';
+    else if(getGametype() === 'Brainless AI') output.innerText = 'Brainless AI';
+    else if(getGametype() === 'Smart AI') output.innerText = 'Smart AI';
+}
+
+function setGametype(value) {
+    slider.value = value;
+}
+
+function saveGametype() {
+    localStorage.setItem('gametype', slider.value);
+}
+
+function getGametype() {
+    switch (Number(slider.value)) {
+        case 1:
+            return 'Player';
+        case 2:
+            return 'Brainless AI';
+        case 3:
+            return 'Smart AI';
+    }
 }
 
 function cellClicked() {
@@ -78,12 +104,11 @@ function checkWinner(board) {
 }
 
 function continueGameMode() {
-    if (Number(slider.value) === 1) {
-    } else if (Number(slider.value) === 2) {
+    if (getGametype() === 'Brainless AI') {
         if (currentPlayer === AIPlayer) {
             randomAIMove();
         }
-    } else if (Number(slider.value) === 3) {
+    } else if (getGametype() === 'Smart AI') {
         if (currentPlayer === AIPlayer) {
             makeAIMove();
         }
@@ -91,31 +116,33 @@ function continueGameMode() {
 }
 
 function makeAIMove() {
-    let bestMove = getBestMove();
+    let bestMove = getBestMove(mainBoard);
     updateCell(cells[bestMove], bestMove);
 }
 
-function getBestMove() {
+function getBestMove(board) {
+    let tempBoard = board;
     let bestScore = -Infinity;
-    let bestMove = -1;
-    for (let i = 0; i < mainBoard.length; i++) {
-        if (mainBoard[i] === "") {
-            mainBoard[i] = AIPlayer;
-            let score = minimax(mainBoard, 0, false);
-            mainBoard[i] = "";
-            if (score > bestScore) {
+    let bestMoves = []
+    for (let i = 0; i < tempBoard.length; i++) {
+        if (tempBoard[i] === "") {
+            tempBoard[i] = AIPlayer;
+            let score = minimax(tempBoard, 0, false);
+            tempBoard[i] = "";
+            if (score == bestScore) {
+                bestMoves.push(i)
+            } else if (score > bestScore) {
                 bestScore = score;
-                bestMove = i;
+                bestMoves = [i]
             }
         }
     }
-    return bestMove;
+    return bestMoves[Math.floor(Math.random() * bestMoves.length)];
 }
 
 function restartGame() {
     currentPlayer = "X";
     mainBoard = ["", "", "", "", "", "", "", "", ""];
-    minimaxStep = 0;
     gameRunning = true;
     statusText.textContent = `${currentPlayer}'s turn`;
     cells.forEach((cell) => (cell.textContent = ""));
@@ -166,6 +193,8 @@ function minimax(board, depth, isMaximizingPlayer) {
 
 slider.oninput = function () {
     restartGame();
+    initTitle();
+    saveGametype();
 };
 
 initGame();
