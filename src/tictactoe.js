@@ -123,15 +123,13 @@ function makeAIMove() {
 function getBestMove(board) {
     let tempBoard = board;
     let bestScore = -Infinity;
-    let bestMoves = []
-    for (let i = 0; i < tempBoard.length; i++) {
-        if (tempBoard[i] === "") {
-            tempBoard[i] = AIPlayer;
-            let score = minimax(tempBoard, 0, false);
-            tempBoard[i] = "";
-            if (score == bestScore) {
-                bestMoves.push(i)
-            } else if (score > bestScore) {
+    let bestMove = -1;
+    for (let i = 0; i < mainBoard.length; i++) {
+        if (mainBoard[i] === "") {
+            mainBoard[i] = AIPlayer;
+            let score = minimax(mainBoard, 0, false);
+            mainBoard[i] = "";
+            if (score > bestScore) {
                 bestScore = score;
                 bestMoves = [i]
             }
@@ -176,7 +174,7 @@ function minimax(board, depth, isMaximizingPlayer) {
                 bestScore = Math.max(bestScore, score);
             }
         }
-        return bestScore;
+        return bestScore - depth;
     } else {
         let bestScore = Infinity;
         for (let i = 0; i < board.length; i++) {
@@ -187,11 +185,11 @@ function minimax(board, depth, isMaximizingPlayer) {
                 bestScore = Math.min(bestScore, score);
             }
         }
-        return bestScore;
+        return bestScore + depth;
     }
 }
 
-slider.oninput = function () {
+slider.oninput = function (e) {
     restartGame();
     initTitle();
     saveGametype();
