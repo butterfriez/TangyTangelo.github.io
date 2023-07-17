@@ -170,24 +170,22 @@ function minimax(board, depth, isMaximizingPlayer) {
         for (let i = 0; i < board.length; i++) {
             if (board[i] === "") {
                 board[i] = AIPlayer;
-                let score = minimax(board, depth + 1, false);
+                let score = minimax(board, depth + 1, true);
                 board[i] = "";
                 bestScore = Math.max(bestScore, score);
             }
         }
-        console.log(`${bestScore - depth}, ${isMaximizingPlayer}`)
         return bestScore - depth;
     } else {
         let bestScore = Infinity;
         for (let i = 0; i < board.length; i++) {
             if (board[i] === "") {
                 board[i] = HumanPlayer;
-                let score = minimax(board, depth + 1, true);
+                let score = minimax(board, depth + 1, false);
                 board[i] = "";
                 bestScore = Math.min(bestScore, score);
             }
         }
-        console.log(`${bestScore + depth}, ${isMaximizingPlayer}`)
         return bestScore + depth;
     }
 }
