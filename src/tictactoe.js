@@ -26,6 +26,7 @@ let scores = {
     tie: 0
 };
 
+//Basic Game
 function initGame() {
     cells.forEach((cell) => cell.addEventListener("click", cellClicked));
     restartBtn.addEventListener("click", restartGame);
@@ -39,25 +40,6 @@ function initTitle() {
     if(getGametype() === 'Player') output.innerText = '2 Players';
     else if(getGametype() === 'Brainless AI') output.innerText = 'Brainless AI';
     else if(getGametype() === 'Smart AI') output.innerText = 'Smart AI';
-}
-
-function setGametype(value) {
-    slider.value = value;
-}
-
-function saveGametype() {
-    localStorage.setItem('gametype', slider.value);
-}
-
-function getGametype() {
-    switch (Number(slider.value)) {
-        case 1:
-            return 'Player';
-        case 2:
-            return 'Brainless AI';
-        case 3:
-            return 'Smart AI';
-    }
 }
 
 function cellClicked() {
@@ -93,6 +75,17 @@ function changePlayer() {
     statusText.textContent = `${currentPlayer}'s turn`;
 }
 
+function getGametype() {
+    switch (Number(slider.value)) {
+        case 1:
+            return 'Player';
+        case 2:
+            return 'Brainless AI';
+        case 3:
+            return 'Smart AI';
+    }
+}
+
 function isGameOver(board) {
     for (let i = 0; i < winConditions.length; i++) {
         const [a, b, c] = winConditions[i];
@@ -103,6 +96,16 @@ function isGameOver(board) {
     return false;
 }
 
+function restartGame() {
+    currentPlayer = "X";
+    mainBoard = ["", "", "", "", "", "", "", "", ""];
+    gameRunning = true;
+    statusText.textContent = `${currentPlayer}'s turn`;
+    cells.forEach((cell) => (cell.textContent = ""));
+    cells.forEach((cell) => cell.addEventListener("click", cellClicked));
+}
+
+//AI
 function continueGameMode() {
     if (getGametype() === 'Brainless AI') {
         if (currentPlayer === AIPlayer) {
@@ -113,6 +116,10 @@ function continueGameMode() {
             makeAIMove();
         }
     }
+}
+
+function setGametype(value) {
+    slider.value = value;
 }
 
 function makeAIMove() {
@@ -137,16 +144,8 @@ function getBestMove(board) {
         }
     }
     return bestMoves[Math.floor(Math.random() * bestMoves.length)];
-};
-
-function restartGame() {
-    currentPlayer = "X";
-    mainBoard = ["", "", "", "", "", "", "", "", ""];
-    gameRunning = true;
-    statusText.textContent = `${currentPlayer}'s turn`;
-    cells.forEach((cell) => (cell.textContent = ""));
-    cells.forEach((cell) => cell.addEventListener("click", cellClicked));
 }
+
 
 function randomAIMove() {
     let available = [];

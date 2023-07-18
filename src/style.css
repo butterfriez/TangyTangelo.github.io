@@ -1,5 +1,5 @@
 .background {
-    background-color: #5f605d;
+    background-color: #343533;
     top: 0;
     left: 0;
     width: 100%;
@@ -17,7 +17,6 @@
     z-index: 2;
     left: 0;
     float: left;
-    background-color: #5f605d;
     overflow-x: hidden;
     padding-top: 16px;
 }
